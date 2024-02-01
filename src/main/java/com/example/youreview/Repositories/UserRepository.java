@@ -22,4 +22,5 @@ public interface UserRepository extends JpaRepository<User, Long>{
     void updatePassword(@Param("username") String username, @Param("password") String password);
 
     boolean existsByUsername(String username);
+
 }
