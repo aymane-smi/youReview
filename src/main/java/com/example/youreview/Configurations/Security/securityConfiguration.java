@@ -27,7 +27,9 @@ public class securityConfiguration {
             .failureUrl("/?error=true")
             .defaultSuccessUrl("/reviews")
             .permitAll()
-        ).logout(logout -> logout.logoutUrl("/logout").permitAll()).build();
+        ).logout(logout -> logout.logoutUrl("/logout").permitAll()).exceptionHandling(exp ->{
+            exp.accessDeniedPage("/?accessDenied=true");
+        }).build();
     }
 
 
