@@ -1,5 +1,8 @@
 package com.example.youreview.Services.Impl;
 
+import java.util.Collections;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,10 +11,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.youreview.Models.Entites.User;
 import com.example.youreview.Repositories.UserRepository;
-import com.example.youreview.Services.UserService;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsManager{
+public class UserServiceImpl implements UserDetailsManager{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder){
@@ -20,7 +22,14 @@ public class UserServiceImpl implements UserService, UserDetailsManager{
     }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("username not found"));
+        System.out.println("=>inside load username");
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("username not found"));
+        System.out.println(user.getPassword());
+        return new org.springframework.security.core.userdetails.User(
+            user.getUsername(),
+            user.getPassword(),
+            Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()))
+        );
     }
     @Override
     public void createUser(UserDetails user) {
