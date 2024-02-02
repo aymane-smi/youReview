@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.example.youreview.Models.Entites.User;
-import com.example.youreview.Services.UserService;
 import com.example.youreview.Services.Impl.UserServiceImpl;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 
