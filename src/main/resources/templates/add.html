@@ -5,16 +5,27 @@
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="flex justify-center items-center flex-col pt-10">
-        <button class="p-2 rounded-md bg-blue-500 text-white absolute right-1 top-1">Logout</button>
+        <div class="absolute right-1 top-1 flex gap-3">
+            <a th:href="@{/logout}" class="p-2 rounded-md bg-blue-500 text-white">Logout</a>
+            <a th:href="@{/}" class="p-2 rounded-md bg-blue-500 text-white">Go back</a>
+        </div>
         <p class="font-bold text-[30px]">add a review</p>
-        <form action="#" method="POST" th:action="@{/add}" th:object="${review}" class="flex flex-col justify-center items-center p-4 gap-3 mt-10">
+        <form action="#" method="POST" th:action="@{/reviews/add}" th:object="${review}" class="flex flex-col justify-center items-center p-4 gap-3 mt-10">
             <div class="flex flex-col justify-start items-start gap-3">
                 <label class="font-semibold">Title</label>
                 <input name="username" th:field="*{Title}" type="text" placeholder="title" class="border p-2 rounded-md w-[300px]"/>
             </div>
             <div class="flex flex-col justify-start items-start gap-3">
                 <label class="font-semibold">Message</label>
-                <textarea name="password" th:field="*{Message}" placeholder="message" class="border p-2 rounded-md w-[300px]"></textarea>
+                <textarea name="password" th:field="*{message}" placeholder="message" class="border p-2 rounded-md w-[300px]"></textarea>
+            </div>
+            <div class="flex flex-col justify-start items-start gap-3">
+                <label class="font-semibold">Reaction</label>
+                <select th:field="*{reaction}">
+                    <option value="HAPPY">😀</option>
+                    <option value="ANGRY">😠</option>
+                    <option value="SAD">☹️</option>
+                </select>
             </div>
             <button class="p-3 text-white bg-blue-500 rounded-md text-[20px] w-[300px]">add</button>
         </form>

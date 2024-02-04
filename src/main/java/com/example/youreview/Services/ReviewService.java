@@ -13,4 +13,8 @@ public interface ReviewService {
     List<Review> getAllReviews();
 
     void deleteReview(UUID id);
+
+    void makeClaim(UUID id);
+
+    List<Review> calimedReviews();
 }

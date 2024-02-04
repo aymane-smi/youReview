@@ -5,18 +5,20 @@
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="flex justify-center items-center flex-col pt-10">
-        <button class="p-2 rounded-md bg-blue-500 text-white absolute right-1 top-1">Logout</button>
+        <a th:href="@{/logout}" class="p-2 rounded-md bg-blue-500 text-white absolute right-1 top-1">Logout</a>
+        <a th:href="@{/}" class="p-2 rounded-md bg-blue-500 text-white absolute right-1 top-1">go back</a>
         <p class="font-bold text-[30px]">List of Claimes</p>
         <!-- list of reviews -->
-        <div class="w-1/2 flex flex-col gap-6 mt-10">
+        <div class="w-1/2 flex flex-col gap-6 mt-10" th:each="review : ${claimes}">
             <!-- review -->
             <div class="flex flex-col gap-3">
-                <p>Title"claimers"</p>
+                <p th:text="${review.Title}"></p>
                 <p>
-                    Message - <sub>time</sub> 😁
+                    <span th:text="${review.message}"></span> - <sub th:text="${review.date}"></sub>
+                    "<span th:text="${review.reaction}"></span>"     
                 </p>
                 <div class="flex gap-2">
-                    <button class="p-2 text-white bg-red-600 rounded-md">delete</button>
+                    <a th:href="@{/reviews/delete/}+${review.id}" class="p-2 text-white bg-red-600 rounded-md">delete</a>
                 </div>
             </div>
         </div>
