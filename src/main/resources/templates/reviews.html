@@ -22,7 +22,7 @@
                 </p>
                 <div class="flex gap-2">
                     <a th:if="${user.role.name() == 'MODERATOR'}" th:href="@{/reviews/claim/}+${review.id}" class="p-2 text-white bg-red-500 rounded-md">make a calim</a>
-                    <a th:if="${user.role.name() == 'ADMIN' or user.role.name() == 'USER' or user.id == review.user.id }" th:href="@{/reviews/edit/}+${review.id}" class="p-2 text-white bg-orange-500 rounded-md">edit</a>
+                    <a th:if="${user.role.name() == 'ADMIN' or user.role.name() == 'MODERATOR' or user.id == review.user.id }" th:href="@{/reviews/edit/}+${review.id}" class="p-2 text-white bg-orange-500 rounded-md">edit</a>
                     <a th:if="${user.role.name() == 'ADMIN' or user.id == review.user.id}" th:href="@{/reviews/delete/}+${review.id}" class="p-2 text-white bg-red-600 rounded-md">delete</a>
                 </div>
             </div>
