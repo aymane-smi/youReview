@@ -27,10 +27,11 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public ReviewDTO saveReview(Review review) {
+    public ReviewDTO saveReview(ReviewDTO reviewDTO) {
         var user = userRepository.findByUsername(
             SecurityUtils.getSessionUser()
         ).get();
+        var review = modelMapper.map(reviewDTO, Review.class);
         review.setUser(user);
         review.setDate(LocalDate.now());
         
