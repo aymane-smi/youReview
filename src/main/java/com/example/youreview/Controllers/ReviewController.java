@@ -1,22 +1,27 @@
 package com.example.youreview.Controllers;
 
+import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.youreview.Configurations.Utils.SecurityUtils;
+import com.example.youreview.Models.Dtos.ReviewDTO;
 import com.example.youreview.Models.Entites.Review;
 import com.example.youreview.Repositories.UserRepository;
 import com.example.youreview.Services.ReviewService;
 
 
-@Controller
+@RestController
 @RequestMapping("/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
@@ -26,13 +31,11 @@ public class ReviewController {
         this.userRepository = userRepository;
     }
     @GetMapping
-    public String reviews(Model model){
-        model.addAttribute("user", userRepository.findByUsername(SecurityUtils.getSessionUser()).get());
-        model.addAttribute("reviews", reviewService.getAllReviews());
-        return "reviews";
+    public ResponseEntity<List<ReviewDTO>> reviews(){
+        return new ResponseEntity<List<ReviewDTO>>(reviewService.getAllReviews(), HttpStatus.OK);
     }
     @GetMapping("/add")
-    public String addReview(Model model){
+    public String addReview(){
         model.addAttribute("review", new Review());
         return "add";
     }
