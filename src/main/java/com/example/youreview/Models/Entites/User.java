@@ -34,4 +34,6 @@ public class User{
     private List<Review> reviews;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "claimedUser")
     private List<Review> claimes;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+    private List<Token> tokens;
 }
