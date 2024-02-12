@@ -8,6 +8,7 @@ import com.example.youreview.Repositories.UserRepository;
 import com.example.youreview.Services.ReviewService;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,7 +26,7 @@ public class ReviewServiceImpl implements ReviewService{
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
-
+    @PreAuthorize("hasAnyRole(Role.USER, Role.ADMIN)")
     @Override
     public ReviewDTO saveReview(ReviewDTO reviewDTO) {
         var user = userRepository.findByUsername(
@@ -37,7 +38,6 @@ public class ReviewServiceImpl implements ReviewService{
         
         return modelMapper.map(reviewRepository.save(review), ReviewDTO.class);
     }
-
     @Override
     public ReviewDTO getReviewById(UUID id) {
         return modelMapper.map(reviewRepository.findById(id).orElse(null), ReviewDTO.class);
@@ -47,12 +47,12 @@ public class ReviewServiceImpl implements ReviewService{
     public List<ReviewDTO> getAllReviews() {
         return Arrays.asList(modelMapper.map(reviewRepository.findAll(), ReviewDTO[].class));
     }
-
+    @PreAuthorize("hasAnyRole(Role.USER, Role.ADMIN)")
     @Override
     public void deleteReview(UUID id) {
         reviewRepository.deleteById(id);
     }
-
+    @PreAuthorize("hasRole(Role.MODERATOR)")
     @Override
     public void makeClaim(UUID id) {
         var user = userRepository.findByUsername(
@@ -64,7 +64,7 @@ public class ReviewServiceImpl implements ReviewService{
         review.setClaimedUser(list);
         reviewRepository.save(review);
     }
-
+    @PreAuthorize("hasAnyRole(Role.MODERATOR, Role.ADMIN)")
     @Override
     public List<ReviewDTO> calimedReviews() {
         List<Review> claimes  = new ArrayList<>();
