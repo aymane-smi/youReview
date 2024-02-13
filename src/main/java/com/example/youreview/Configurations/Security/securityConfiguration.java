@@ -20,13 +20,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.example.youreview.Configurations.Utils.CONSTANTS;
 import com.example.youreview.Services.Impl.UserServiceImpl;
@@ -51,16 +51,22 @@ public class securityConfiguration {
     }
     @Bean
      protected SecurityFilterChain filterChain(HttpSecurity http)throws Exception{
-        System.out.println("inside filter");
-        http.authorizeHttpRequests(req -> {
-                req.requestMatchers(new AntPathRequestMatcher("/api/auth/signin", HttpMethod.POST.name())).permitAll()
-                .requestMatchers("/api/auth/signin").permitAll().anyRequest().authenticated();
+        http.formLogin(login->{
+            login.disable();
+        }).csrf(crsf ->{
+            crsf.disable();
+        }).cors(cors -> {
+            cors.disable();
+        }).authorizeHttpRequests(req -> {
+                req.requestMatchers("/api/auth/signin").permitAll().anyRequest().authenticated();
             })
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt
                     .jwtAuthenticationConverter(getJwtAuthenticationConverter())
                 )
-            );
+            ).sessionManagement(session -> {
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            });
         return http.build();
     }
 

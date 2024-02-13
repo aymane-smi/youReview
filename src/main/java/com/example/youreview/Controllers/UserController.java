@@ -1,45 +1,38 @@
 package com.example.youreview.Controllers;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import com.example.youreview.Configurations.Utils.SecurityUtils;
-import com.example.youreview.Models.Entites.User;
+import com.example.youreview.Models.Dtos.SignedInUser;
+import com.example.youreview.Models.Dtos.UserAuthDTO;
 import com.example.youreview.Services.Impl.UserServiceImpl;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import jakarta.validation.Valid;
 
 
 
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/api/auth")
 public class UserController {
     private final UserServiceImpl userService;
     public UserController(UserServiceImpl userService){
         this.userService = userService;
     }
-    @GetMapping
-    public String login(Model model) {
-        if(SecurityUtils.getSessionUser() != null)
-            return "redirect:/reviews";
-        model.addAttribute("user", new User());
-        return "login";
+    @PostMapping("/signin")
+    public ResponseEntity<SignedInUser> login(@Valid @RequestBody UserAuthDTO user) {
+        System.out.println("inside controller");
+        return new ResponseEntity<SignedInUser>(userService.signUser(user), HttpStatus.OK);
     }
-    @GetMapping("/logout")
-    public String logout(){
-        return "redirect:/?logout=true";
-    }
-    // @GetMapping("/reviews")
-    // public String reviews() {
-    //     return "reviews";
-    // }
     
-    // @PostMapping("/")
-    // public String loginPost() {
-    //     return "redirect:/reviews";
-    // }
+    @PostMapping("/")
+    public String test() {
+        return "test";
+    }
     
     
 }

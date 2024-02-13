@@ -26,18 +26,18 @@ public class ReviewServiceImpl implements ReviewService{
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
-    @PreAuthorize("hasAnyRole(Role.USER, Role.ADMIN)")
-    @Override
-    public ReviewDTO saveReview(ReviewDTO reviewDTO) {
-        var user = userRepository.findByUsername(
-            SecurityUtils.getSessionUser()
-        ).get();
-        var review = modelMapper.map(reviewDTO, Review.class);
-        review.setUser(user);
-        review.setDate(LocalDate.now());
+    // @PreAuthorize("hasAnyRole(Role.USER, Role.ADMIN)")
+    // @Override
+    // public ReviewDTO saveReview(ReviewDTO reviewDTO) {
+    //     var user = userRepository.findByUsername(
+    //         SecurityUtils.getSessionUser()
+    //     ).get();
+    //     var review = modelMapper.map(reviewDTO, Review.class);
+    //     review.setUser(user);
+    //     review.setDate(LocalDate.now());
         
-        return modelMapper.map(reviewRepository.save(review), ReviewDTO.class);
-    }
+    //     return modelMapper.map(reviewRepository.save(review), ReviewDTO.class);
+    // }
     @Override
     public ReviewDTO getReviewById(UUID id) {
         return modelMapper.map(reviewRepository.findById(id).orElse(null), ReviewDTO.class);
@@ -52,18 +52,18 @@ public class ReviewServiceImpl implements ReviewService{
     public void deleteReview(UUID id) {
         reviewRepository.deleteById(id);
     }
-    @PreAuthorize("hasRole(Role.MODERATOR)")
-    @Override
-    public void makeClaim(UUID id) {
-        var user = userRepository.findByUsername(
-            SecurityUtils.getSessionUser()
-        ).get();
-        var review = reviewRepository.findById(id).get();
-        var list = review.getClaimedUser();
-        list.add(user);
-        review.setClaimedUser(list);
-        reviewRepository.save(review);
-    }
+    // @PreAuthorize("hasRole(Role.MODERATOR)")
+    // @Override
+    // public void makeClaim(UUID id) {
+    //     var user = userRepository.findByUsername(
+    //         SecurityUtils.getSessionUser()
+    //     ).get();
+    //     var review = reviewRepository.findById(id).get();
+    //     var list = review.getClaimedUser();
+    //     list.add(user);
+    //     review.setClaimedUser(list);
+    //     reviewRepository.save(review);
+    // }
     @PreAuthorize("hasAnyRole(Role.MODERATOR, Role.ADMIN)")
     @Override
     public List<ReviewDTO> calimedReviews() {
