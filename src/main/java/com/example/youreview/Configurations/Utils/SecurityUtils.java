@@ -10,8 +10,9 @@ import org.springframework.stereotype.Component;
 public class SecurityUtils {
     public static Object getSessionUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(SecurityContextHolder.getContext().getAuthentication());
         if(authentication instanceof JwtAuthenticationToken)
-            return authentication.getDetails();
+            return authentication.getPrincipal();
         return null;
     }
     

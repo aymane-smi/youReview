@@ -12,19 +12,28 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -35,6 +44,20 @@ import com.example.youreview.Services.Impl.UserServiceImpl;
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 public class securityConfiguration {
+    private class CostumeAuthenticationTokenConverter implements Converter<Jwt, JwtAuthenticationToken>{
+
+        @Override
+        public JwtAuthenticationToken convert(Jwt source) {
+            System.out.println("inside the converter");
+            List<String> authorities = (List<String>)source.getClaims().get("roles");
+            JwtAuthenticationToken auth = new JwtAuthenticationToken(source, authorities.stream().map(SimpleGrantedAuthority::new).toList());
+            //auth.setDetails(auth);
+            return auth;
+            //converter.setJwtGrantedAuthoritiesConverter(authorities);
+            //converter.setPrincipalClaimName(KeyStoreAlias);
+        }
+
+    }
     @Value("${app.security.jwt.keystore-location}")
     private String KeyStorePath;
     @Value("${app.security.jwt.keystore-password}")
@@ -43,8 +66,8 @@ public class securityConfiguration {
     private String KeyStoreAlias;
     @Value("${app.security.jwt.private-key-passPhrase}")
     private String passPhrase;
-    private UserServiceImpl userService;
-    private PasswordEncoder passwordEncoder;
+    private final UserServiceImpl userService;
+    private final PasswordEncoder passwordEncoder;
     public securityConfiguration(UserServiceImpl userService, PasswordEncoder passwordEncoder){
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -61,23 +84,35 @@ public class securityConfiguration {
                 req.requestMatchers("/api/auth/signin").permitAll().anyRequest().authenticated();
             })
             .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt
-                    .jwtAuthenticationConverter(getJwtAuthenticationConverter())
-                )
+                .jwt(jwt -> {
+                    jwt.jwtAuthenticationConverter(new CostumeAuthenticationTokenConverter());
+                })
             ).sessionManagement(session -> {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
             });
         return http.build();
     }
 
-    private JwtAuthenticationConverter getJwtAuthenticationConverter(){
-        JwtGrantedAuthoritiesConverter authorityConverter = new JwtGrantedAuthoritiesConverter();
-        authorityConverter.setAuthorityPrefix(CONSTANTS.AUTHORITY_PREFIX);
-        authorityConverter.setAuthoritiesClaimName(CONSTANTS.ROLE_CLAIM);
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(authorityConverter);
-        return converter;
-    }
+    // private AbstractAuthenticationToken getJwtAuthenticationConverter(Jwt jwt) {
+    // JwtGrantedAuthoritiesConverter authorityConverter = new JwtGrantedAuthoritiesConverter();
+    // authorityConverter.setAuthorityPrefix(CONSTANTS.AUTHORITY_PREFIX);
+    // authorityConverter.setAuthoritiesClaimName(CONSTANTS.ROLE_CLAIM);
+    // JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+    // converter.setPrincipalClaimName(jwt.getSubject());
+    // converter.setJwtGrantedAuthoritiesConverter(authorityConverter);
+    // return converter;
+    //}
+
+  @Bean
+  public AuthenticationManager authenticationManager(
+      AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    return authenticationConfiguration.getAuthenticationManager();
+  }
+
+  @Bean
+  protected UserDetailsService userDetailsService() {
+    return userService;
+  }
 
     @Bean
     public KeyStore keyStore(){

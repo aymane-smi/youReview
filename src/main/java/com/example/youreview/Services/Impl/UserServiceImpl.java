@@ -75,14 +75,14 @@ public class UserServiceImpl implements UserService, UserDetailsService{
                 loadUserByUsername(userJPA.getUsername())
             );
             System.out.println(
-                SecurityUtils.getSessionUser()
+                "USER DETAILS=>"+SecurityUtils.getSessionUser()
             );
             return new SignedInUser().builder().username(userJPA.getUsername())
                                                .id(userJPA.getId())
                                                .token(token)
                                                .build();
         }else{
-            throw new InsufficientAuthenticationException(" warah UnAuthorized");
+            throw new InsufficientAuthenticationException("UnAuthorized");
         }
     }
 }
