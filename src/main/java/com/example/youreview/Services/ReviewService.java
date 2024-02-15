@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReviewService {
-    //ReviewDTO saveReview(ReviewDTO review);
+    ReviewDTO saveReview(ReviewDTO review);
 
     ReviewDTO getReviewById(UUID id);
 
@@ -14,7 +14,7 @@ public interface ReviewService {
 
     void deleteReview(UUID id);
 
-    //void makeClaim(UUID id);
+    void makeClaim(UUID id);
 
     List<ReviewDTO> calimedReviews();
 }

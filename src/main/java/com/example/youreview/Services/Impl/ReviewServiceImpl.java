@@ -1,8 +1,10 @@
 package com.example.youreview.Services.Impl;
 
-import com.example.youreview.Configurations.Utils.SecurityUtils;
+import com.example.youreview.Configurations.Utils.SecurityContext;
 import com.example.youreview.Models.Dtos.ReviewDTO;
 import com.example.youreview.Models.Entites.Review;
+import com.example.youreview.Models.Entites.User;
+import com.example.youreview.Models.Enums.Role;
 import com.example.youreview.Repositories.ReviewRepository;
 import com.example.youreview.Repositories.UserRepository;
 import com.example.youreview.Services.ReviewService;
@@ -26,18 +28,18 @@ public class ReviewServiceImpl implements ReviewService{
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
-    // @PreAuthorize("hasAnyRole(Role.USER, Role.ADMIN)")
-    // @Override
-    // public ReviewDTO saveReview(ReviewDTO reviewDTO) {
-    //     var user = userRepository.findByUsername(
-    //         SecurityUtils.getSessionUser()
-    //     ).get();
-    //     var review = modelMapper.map(reviewDTO, Review.class);
-    //     review.setUser(user);
-    //     review.setDate(LocalDate.now());
+    @PreAuthorize("hasAnyAuthority('USER')")
+    @Override
+    public ReviewDTO saveReview(ReviewDTO reviewDTO) {
+        var user = userRepository.findByUsername(
+            SecurityContext.getName()
+        ).get();
+        var review = modelMapper.map(reviewDTO, Review.class);
+        review.setUser(user);
+        review.setDate(LocalDate.now());
         
-    //     return modelMapper.map(reviewRepository.save(review), ReviewDTO.class);
-    // }
+        return modelMapper.map(reviewRepository.save(review), ReviewDTO.class);
+    }
     @Override
     public ReviewDTO getReviewById(UUID id) {
         return modelMapper.map(reviewRepository.findById(id).orElse(null), ReviewDTO.class);
@@ -47,24 +49,35 @@ public class ReviewServiceImpl implements ReviewService{
     public List<ReviewDTO> getAllReviews() {
         return Arrays.asList(modelMapper.map(reviewRepository.findAll(), ReviewDTO[].class));
     }
-    @PreAuthorize("hasAnyRole(Role.USER, Role.ADMIN)")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @Override
     public void deleteReview(UUID id) {
-        reviewRepository.deleteById(id);
+        User user = userRepository.findByUsername(
+            SecurityContext.getName()
+        ).get();
+        Review review = reviewRepository.findById(id).get();
+        if(user.getRole() == Role.USER )
+            reviewRepository.deleteById(id);
+        else if(user.getRole() == Role.ADMIN && review.getUser().getUsername().equals(user.getUsername())){
+            reviewRepository.deleteById(id);
+        }else{
+            throw new RuntimeException("Unauthorized");
+        }
     }
-    // @PreAuthorize("hasRole(Role.MODERATOR)")
-    // @Override
-    // public void makeClaim(UUID id) {
-    //     var user = userRepository.findByUsername(
-    //         SecurityUtils.getSessionUser()
-    //     ).get();
-    //     var review = reviewRepository.findById(id).get();
-    //     var list = review.getClaimedUser();
-    //     list.add(user);
-    //     review.setClaimedUser(list);
-    //     reviewRepository.save(review);
-    // }
-    @PreAuthorize("hasAnyRole(Role.MODERATOR, Role.ADMIN)")
+    @PreAuthorize("hasAuthority('MODERATOR')")
+    @Override
+    public void makeClaim(UUID id) {
+        System.out.println("security context=>"+SecurityContext.getName());
+        var user = userRepository.findByUsername(
+            SecurityContext.getName()
+        ).get();
+        var review = reviewRepository.findById(id).get();
+        var list = review.getClaimedUser();
+        list.add(user);
+        review.setClaimedUser(list);
+        reviewRepository.save(review);
+    }
+    @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
     @Override
     public List<ReviewDTO> calimedReviews() {
         List<Review> claimes  = new ArrayList<>();

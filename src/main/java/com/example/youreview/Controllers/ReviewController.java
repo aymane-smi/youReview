@@ -41,11 +41,11 @@ public class ReviewController {
         return new ResponseEntity<String>("deleted", HttpStatus.ACCEPTED);
     }
 
-    // @PostMapping("/claim/{id}")
-    // public ResponseEntity<String> addClaim(@PathVariable UUID id){
-    //     reviewService.makeClaim(id);
-    //     return new ResponseEntity<String>("claim made", HttpStatus.OK);
-    // }
+    @PostMapping("/claim/{id}")
+    public ResponseEntity<String> addClaim(@PathVariable UUID id){
+        reviewService.makeClaim(id);
+        return new ResponseEntity<String>("claim made", HttpStatus.OK);
+    }
 
     @GetMapping("/claimes")
     public ResponseEntity<List<ReviewDTO>> showClaimes(Model model){
